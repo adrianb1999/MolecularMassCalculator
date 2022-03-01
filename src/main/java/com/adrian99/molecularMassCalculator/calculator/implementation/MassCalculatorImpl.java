@@ -1,71 +1,109 @@
 package com.adrian99.molecularMassCalculator.calculator.implementation;
 
 import com.adrian99.molecularMassCalculator.calculator.MassCalculator;
+import com.adrian99.molecularMassCalculator.exception.InvalidFormulaException;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
 
 @Component
 public class MassCalculatorImpl implements MassCalculator {
+
+    Map<String, Double> mass = masses();
+    List<String> elements = new ArrayList<>();
+
     @Override
-    public Double calculate(String formula) {
-        Map<String, Double> masses = masses();
+    public List<Map<String, Object>> startCalculator(String formula) {
 
-        Map<String, Integer> integerMap = new HashMap<>();
+        formula = formula.toUpperCase();
+        String newFormula = formula.replaceAll("\\d", "");
 
-        for (int i = 0; i < formula.length(); i++) {
-            if (isUpper(formula.charAt(i)) && (i == formula.length() - 1)) {
-                integerMap.put(String.valueOf(formula.charAt(i)), 1);
-                break;
-            }
+        splitFormula(newFormula, "");
 
-            if (isUpper(formula.charAt(i))) {
-                if (isUpper(formula.charAt(i + 1))) {
-                    integerMap.put(String.valueOf(formula.charAt(i)), 1);
-                    continue;
-                }
-                if (isNumber(formula.charAt(i + 1))) {
-                    if (i + 2 < formula.length())
-                        if (isNumber(formula.charAt(i + 2))) {
-                            integerMap.put(formula.substring(i, i + 1), Integer.parseInt(formula.substring(i + 1, i + 3)));
-                            i += 2;
-                            continue;
-                        }
-                    integerMap.put(String.valueOf(formula.charAt(i)), (formula.charAt(i + 1) - '0'));
-                    continue;
-                }
-                if (isLower(formula.charAt(i + 1))) {
-                    if (i + 2 == formula.length()) {
-                        integerMap.put(formula.substring(i, i + 2), 1);
+        List<Map<String, Object>> map = new ArrayList<>();
+
+        if (elements.size() == 0)
+            throw new InvalidFormulaException("Invalid formula!");
+
+        for (String e : elements) {
+            StringBuilder currentElement = new StringBuilder();
+            double mass = 0D;
+            String[] list = e.split(" ");
+            for (String el : list) {
+                if (!el.isEmpty()) {
+                    if (!formula.contains(el.toUpperCase())) {
+                        mass = -1;
                         break;
                     }
-                    if (isNumber(formula.charAt(i + 2))) {
-                        if (i + 3 < formula.length()) {
-                            if (isNumber(formula.charAt(i + 3))) {
-                                integerMap.put(formula.substring(i, i + 2), Integer.parseInt(formula.substring(i + 2, i + 4)));
-                                i += 3;
-                                continue;
-                            }
-                        }
-                        integerMap.put(formula.substring(i, i + 2), (formula.charAt(i + 2) - '0'));
-                        i += 2;
-                    }
+
+                    int num = ifNumber(formula.indexOf(el.toUpperCase()) + el.length() - 1, formula);
+                    currentElement.append(el).append(num == 1 ? "" : num);
+                    mass += num * this.mass.get(el);
                 }
             }
+
+            if (mass == -1)
+                continue;
+
+            map.add(Map.of(
+                    "element", currentElement.toString(),
+                    "mass", BigDecimal.valueOf(mass).setScale(4, RoundingMode.HALF_EVEN).doubleValue()
+                    )
+            );
         }
-        double mass = 0D;
 
-        for (var entry : integerMap.entrySet()) {
-
-            mass += (entry.getValue() * masses.get(entry.getKey()));
-        }
-
-        return mass;
+        elements.clear();
+        return map;
     }
+
+    public int ifNumber(int position, String formula) {
+        Integer number = null;
+        if (position == formula.length() - 1)
+            return 1;
+
+        try {
+            if (position + 2 >= formula.length())
+                number = Integer.parseInt(formula.substring(position + 1, position + 2));
+            else
+                number = Integer.parseInt(formula.substring(position + 1, position + 3));
+
+            return number;
+
+        } catch (NumberFormatException e) {
+            try {
+                number = Integer.parseInt(formula.substring(position + 1, position + 2));;
+                return number;
+            } catch (NumberFormatException ex) {
+                return 1;
+            }
+        }
+    }
+
+    public void splitFormula(String formula, String currentForm) {
+        int length = formula.length();
+        if (length <= 1) {
+            if (mass.containsKey(formula))
+                elements.add(currentForm + " " + formula);
+            return;
+        }
+        String lowerCase = String.valueOf(formula.charAt(1)).toLowerCase();
+        if (length == 2) {
+            String elem = formula.charAt(0) + lowerCase;
+            if (mass.containsKey(elem))
+                elements.add(currentForm + " " + elem);
+        }
+
+        if (mass.containsKey(formula.substring(0, 1)))
+            splitFormula(formula.substring(1, length), currentForm + " " + formula.charAt(0));
+
+        String elem = formula.charAt(0) + lowerCase;
+        if (mass.containsKey(elem))
+            splitFormula(formula.substring(2, length), currentForm + " " + elem);
+    }
+
 
     public Map<String, Double> masses() {
         File file = new File(".\\src\\main\\resources\\data\\MolecularMasses.txt");
@@ -90,18 +128,6 @@ public class MassCalculatorImpl implements MassCalculator {
         }
 
         return map;
-    }
-
-    public static boolean isLower(char c) {
-        return c >= 'a' && c <= 'z';
-    }
-
-    public static boolean isUpper(char c) {
-        return c >= 'A' && c <= 'Z';
-    }
-
-    public static boolean isNumber(char c) {
-        return c >= '0' && c <= '9';
     }
 }
 

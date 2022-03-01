@@ -5,7 +5,66 @@ body, html {
 
 body {
     font-family: Roboto;
-    height: 100vh;
-    background: linear-gradient(45deg, #49a09d, #e9c8ff);
+    background: linear-gradient(45deg, #18074e, #161002);
     display: flex;
+}
+.total{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+}
+.card{
+    width: 400px;
+    background-color: white;
+    border-radius: 10px;
+    margin: auto;
+    padding: 10px;
+}
+.cardTitle{
+    text-align: center;
+}
+.cardTitle h2{
+    font-family: Roboto;
+}
+.cardBody{
+    width: 400px;
+    min-height: 150px;
+    text-align: center;
+    margin: auto;
+}
+.button{
+    font-family: Roboto, serif;
+    font-size: 20px;
+    background-color: #1dd1a1;
+    color: white;
+    border-radius: 7px;
+    width: 200px;
+    height: 50px;
+    border: 0;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    transition: 0.5s;
+    font-weight: bold;
+    box-shadow: 0 0 2px 0 #1dd1a1;
+    cursor: pointer;
+}
+#formulaForm{
+    margin: auto;
+    width: 300px;
+}
+#formulaInput{
+    width: 280px;
+    padding: 8px 5px 9px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #4d959b;
+    font-size: 20px;
+    font-family: Roboto;
+    color: #2f3542;
+    text-align: center;
 }

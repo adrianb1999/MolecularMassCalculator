@@ -1,6 +1,7 @@
 package com.adrian99.molecularMassCalculator.calculator.implementation;
 
 import com.adrian99.molecularMassCalculator.calculator.MassCalculator;
+import com.adrian99.molecularMassCalculator.dto.FormulaDto;
 import com.adrian99.molecularMassCalculator.exception.InvalidFormulaException;
 import org.springframework.stereotype.Component;
 
@@ -18,14 +19,14 @@ public class MassCalculatorImpl implements MassCalculator {
     List<String> elements = new ArrayList<>();
 
     @Override
-    public List<Map<String, Object>> startCalculator(String formula) {
+    public Map<String,List<FormulaDto>> startCalculator(String formula) {
 
         formula = formula.toUpperCase();
         String newFormula = formula.replaceAll("\\d", "");
 
         splitFormula(newFormula, "");
 
-        List<Map<String, Object>> map = new ArrayList<>();
+        List<FormulaDto> map = new ArrayList<>();
 
         if (elements.size() == 0)
             throw new InvalidFormulaException("Invalid formula!");
@@ -50,15 +51,12 @@ public class MassCalculatorImpl implements MassCalculator {
             if (mass == -1)
                 continue;
 
-            map.add(Map.of(
-                    "element", currentElement.toString(),
-                    "mass", BigDecimal.valueOf(mass).setScale(4, RoundingMode.HALF_EVEN).doubleValue()
-                    )
-            );
+            map.add(new FormulaDto(currentElement.toString(),
+                    BigDecimal.valueOf(mass).setScale(4, RoundingMode.HALF_EVEN).doubleValue()));
         }
 
         elements.clear();
-        return map;
+        return Map.of("formulas", map);
     }
 
     public int ifNumber(int position, String formula) {

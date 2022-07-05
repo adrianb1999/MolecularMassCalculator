@@ -18,11 +18,22 @@ public class CalculatorController {
     }
 
     @GetMapping("/api/massCalculator")
-    public Map<String, List<FormulaDto>> calculator(@RequestBody(required=false) Map<String, String> formula) {
-        if(formula == null || formula.isEmpty() || !formula.containsKey("formula") || formula.get("formula").isEmpty() || formula.get("formula").isBlank())
+    public Map<String, List<FormulaDto>> calculator(@RequestParam(name = "formula", required = false) String paramFormula,
+                                                    @RequestBody(required=false) Map<String, String> formula) {
+
+        String molecularFormula = "";
+
+        if(formula == null && paramFormula == null)
             throw new InvalidFormulaException("Invalid formula!");
 
-        String molecularFormula = formula.get("formula");
+        if(formula != null && formula.containsKey("formula"))
+            molecularFormula = formula.get("formula");
+        else
+            molecularFormula = paramFormula;
+
+        if(molecularFormula == null || molecularFormula.isEmpty() || molecularFormula.isBlank())
+            throw new InvalidFormulaException("Invalid formula!");
+
 
         return massCalculator.startCalculator(molecularFormula);
     }

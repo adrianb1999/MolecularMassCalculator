@@ -4,7 +4,7 @@ function calculateMass() {
     let result = document.getElementById("massResult")
     result.innerHTML = ""
 
-    fetch(`/api/massCalculator?formula=${formula}`,
+   fetch(`/api/massCalculator?formula=${formula}`,
         {
             method: 'GET',
         })
@@ -12,9 +12,9 @@ function calculateMass() {
                 if (response.status === 200) {
                     response.json().then(data => {
 
-                            for (i of data) {
+                            for (i of data.formulas) {
                                 result.insertAdjacentHTML("beforeend",
-                                    `${i.element} : ${i.mass}<br>`
+                                    `${i.formula} : ${i.mass}<br>`
                                 )
                             }
                         }

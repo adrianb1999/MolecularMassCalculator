@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Component
@@ -106,7 +108,11 @@ public class MassCalculatorImpl implements MassCalculator {
 
 
     public Map<String, Double> masses() {
-        File file = new File(".\\src\\main\\resources\\data\\MolecularMasses.txt");
+
+        Path currentPath = Paths.get(System.getProperty("user.dir"));
+        Path filePath = Paths.get(currentPath.toString(), "src", "main","resources","data","MolecularMasses.txt");
+
+        File file = new File(filePath.toString());
 
         BufferedReader br = null;
         try {

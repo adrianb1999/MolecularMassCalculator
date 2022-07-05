@@ -1,5 +1,7 @@
 package com.adrian99.molecularMassCalculator.dto;
 
+import java.util.Objects;
+
 public class FormulaDto {
 
     private String formula;
@@ -27,5 +29,18 @@ public class FormulaDto {
 
     public void setMass(Double mass) {
         this.mass = mass;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FormulaDto that = (FormulaDto) o;
+        return Objects.equals(formula, that.formula) && Objects.equals(mass, that.mass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(formula, mass);
     }
 }

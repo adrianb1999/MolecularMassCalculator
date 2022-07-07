@@ -14,6 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,8 +77,16 @@ class CalculatorControllerTest {
 
     @Test
     void passWhenArgumentPresent() throws Exception{
+
+        List<FormulaDto> formulaDtoList = new ArrayList<>();
+        formulaDtoList.add(new FormulaDto("H2O", 18.0152D));
+
+        Map<String, List<FormulaDto>> responseMap = new HashMap<>();
+        responseMap.put("formulas", formulaDtoList);
+
+
         when(massCalculator.startCalculator("H2O"))
-                .thenReturn(Map.of("formulas", List.of(new FormulaDto("H2O", 18.0152D))));
+                .thenReturn(responseMap);
 
         mockMvc.perform(get("/api/massCalculator?formula=H2O")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -90,8 +100,15 @@ class CalculatorControllerTest {
     @Test
     void passWhenValidFormula() throws Exception {
 
+        List<FormulaDto> formulaDtoList = new ArrayList<>();
+        formulaDtoList.add(new FormulaDto("H2O", 18.0152D));
+
+        Map<String, List<FormulaDto>> responseMap = new HashMap<>();
+        responseMap.put("formulas", formulaDtoList);
+
+
         when(massCalculator.startCalculator("H2O"))
-                .thenReturn(Map.of("formulas", List.of(new FormulaDto("H2O", 18.0152D))));
+                .thenReturn(responseMap);
 
         mockMvc.perform(get("/api/massCalculator")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -27,7 +27,7 @@ public class CalculatorController {
         else
             molecularFormula = paramFormula;
 
-        if(molecularFormula == null || molecularFormula.isEmpty() || molecularFormula.isBlank())
+        if(molecularFormula == null || molecularFormula.isEmpty())
             throw new InvalidFormulaException("Invalid formula!");
 
         return massCalculator.startCalculator(molecularFormula);

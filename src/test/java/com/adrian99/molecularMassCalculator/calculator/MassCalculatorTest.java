@@ -10,6 +10,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +34,14 @@ class MassCalculatorTest {
 
     @Test
     void passWhenValidFormula() {
-       assertThat(massCalculator.startCalculator("H2O"))
-               .isEqualTo(Map.of("formulas", List.of(new FormulaDto("H2O", 18.0152D))));
+        List<FormulaDto> formulaDtoList = new ArrayList<>();
+        formulaDtoList.add(new FormulaDto("H2O", 18.0152D));
+
+        Map<String, List<FormulaDto>> responseMap = new HashMap<>();
+        responseMap.put("formulas", formulaDtoList);
+
+        assertThat(massCalculator.startCalculator("H2O"))
+               .isEqualTo(responseMap);
     }
 
     @Test

@@ -56,7 +56,11 @@ public class MassCalculatorImpl implements MassCalculator {
         }
 
         elements.clear();
-        return Map.of("formulas", map);
+
+        Map<String, List<FormulaDto>> formulasMap = new HashMap<>();
+        formulasMap.put("formulas", map);
+
+        return formulasMap;
     }
 
     public int ifNumber(int position, String formula) {

@@ -31,7 +31,6 @@ class CalculatorControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-
     @Test
     void failsWhenFormulaIsInvalid() throws Exception{
         when(massCalculator.startCalculator("zz"))
@@ -54,12 +53,38 @@ class CalculatorControllerTest {
     }
 
     @Test
-    void failsWhenNoBodyPresent() throws Exception{
-        mockMvc.perform(get("/api/massCalculator")
+    void failsWhenArgumentInvalid ()throws Exception{
+        when(massCalculator.startCalculator("zzz"))
+                .thenThrow(new InvalidFormulaException("Invalid formula!"));
+
+        mockMvc.perform(get("/api/massCalculator?formula=zzz")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Invalid formula!"));
+    }
+
+    @Test
+    void failsWhenNoBodyPresent() throws Exception{
+        mockMvc.perform(get("/api/massCalculator?formula=")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid formula!"));
+    }
+
+    @Test
+    void passWhenArgumentPresent() throws Exception{
+        when(massCalculator.startCalculator("H2O"))
+                .thenReturn(Map.of("formulas", List.of(new FormulaDto("H2O", 18.0152D))));
+
+        mockMvc.perform(get("/api/massCalculator?formula=H2O")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.formulas[0].formula").value("H2O"))
+                .andExpect(jsonPath("$.formulas[0].mass").value(18.0152D));
+
     }
 
     @Test
